@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, #667eea, #764ba2, #6dd5ed, #2193b0);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        .container {
+            width: 350px;
+            padding: 30px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            color: #fff;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .toggle {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .toggle button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: #fff;
+            transition: 0.3s;
+        }
+
+        .toggle .active {
+            background: #fff;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: #ddd;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        .input-group input:focus + label,
+        .input-group input:valid + label {
+            top: -8px;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #fff;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background: #f1f1f1;
+        }
+
+        .footer {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2 id="title">User Login</h2>
+
+    <div class="toggle">
+        <button id="userBtn" class="active">User</button>
+        <button id="adminBtn">Admin</button>
+    </div>
+
+    <form method="POST" action="/login">
+        <input type="hidden" name="role" id="role" value="user">
+
+        <div class="input-group">
+            <input type="text" name="username" required>
+            <label>Username</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" name="password" required>
+            <label>Password</label>
+        </div>
+
+        <button class="btn">Login</button>
+    </form>
+
+    <div class="footer">
+        Secure AI Chatbot Access 🔐
+    </div>
+</div>
+
+<script>
+    const userBtn = document.getElementById("userBtn");
+    const adminBtn = document.getElementById("adminBtn");
+    const roleInput = document.getElementById("role");
+    const title = document.getElementById("title");
+
+    userBtn.onclick = () => {
+        userBtn.classList.add("active");
+        adminBtn.classList.remove("active");
+        roleInput.value = "user";
+        title.innerText = "User Login";
+    }
+
+    adminBtn.onclick = () => {
+        adminBtn.classList.add("active");
+        userBtn.classList.remove("active");
+        roleInput.value = "admin";
+        title.innerText = "Admin Login";
+    }
+</script>
+
+</body>
+</html>

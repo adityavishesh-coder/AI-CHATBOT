@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Chatbot</title>
+
+<style>
+body {margin:0;display:flex;height:100vh;font-family:sans-serif;background:#0f172a;color:white;}
+
+.sidebar {width:250px;background:#020617;padding:10px;}
+.chat-area {flex:1;display:flex;flex-direction:column;}
+.chat {flex:1;padding:20px;overflow-y:auto;}
+
+.msg {margin:10px 0;padding:10px;border-radius:10px;max-width:70%;}
+.user {background:#3b82f6;margin-left:auto;}
+.bot {background:#334155;}
+
+.input {display:flex;padding:10px;background:#1e293b;}
+input {flex:1;padding:10px;border:none;border-radius:5px;}
+
+button {
+    margin-left:5px;
+    padding:10px;
+    background:#3b82f6;
+    border:none;
+    color:white;
+    cursor:pointer;
+}
+
+.chat-item {padding:10px;margin:5px 0;background:#1e293b;border-radius:5px;cursor:pointer;}
+.chat-item:hover {background:#334155;}
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <button onclick="newChat()">+ New Chat</button>
+
+    {% for cid, msgs in chats.items() %}
+        <div class="chat-item" onclick="openChat('{{cid}}')">
+            Chat {{ loop.index }}
+        </div>
+    {% endfor %}
+</div>
+
+<!-- CHAT AREA -->
+<div class="chat-area">
+
+<div id="chat" class="chat">
+{% for msg in history %}
+<div class="msg {{ msg.sender }}">{{ msg.message }}</div>
+{% endfor %}
+</div>
+
+<div class="input">
+<input id="msg" placeholder="Ask anything..." onkeypress="enter(event)">
+
+<button onclick="send()">Send</button>
+<button onclick="startListening()">🎤</button>
+<button onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+
+<script>
+const socket = io();
+let chat_id = "{{ current_chat }}";
+const chat = document.getElementById("chat");
+
+// ===== SEND MESSAGE =====
+function send(){
+    let msg = document.getElementById("msg").value.trim();
+    if(!msg) return;
+
+    add(msg,"user");
+
+    socket.emit("send_message",{message:msg, chat_id:chat_id});
+
+    document.getElementById("msg").value="";
+}
+
+function enter(e){
+    if(e.key==="Enter") send();
+}
+
+// ===== DISPLAY MESSAGE =====
+function add(text,type){
+    let div=document.createElement("div");
+    div.className="msg "+type;
+    div.innerText=text;
+    chat.appendChild(div);
+    chat.scrollTop=chat.scrollHeight;
+}
+
+// ===== BOT RESPONSE =====
+socket.on("bot_response", data=>{
+    add(data.message,"bot");
+    speak(data.message); // 🔊 speak reply
+});
+
+// ===== TEXT TO SPEECH =====
+function speak(text){
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.rate = 1;
+    speech.pitch = 1;
+    speech.lang = "en-US";
+    window.speechSynthesis.speak(speech);
+}
+
+// ===== VOICE INPUT =====
+function startListening(){
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+    recognition.lang = "en-US";
+    recognition.start();
+
+    recognition.onresult = function(event){
+        const voiceText = event.results[0][0].transcript;
+        document.getElementById("msg").value = voiceText;
+        send(); // auto send
+    };
+
+    recognition.onerror = function(){
+        alert("Voice recognition not supported or mic blocked.");
+    };
+}
+
+// ===== NAVIGATION =====
+function newChat(){
+    window.location.href="/new_chat";
+}
+
+function openChat(id){
+    window.location.href="/chatbot?chat_id="+id;
+}
+
+function logout(){
+    window.location.href="/logout";
+}
+</script>
+
+</body>
+</html>
